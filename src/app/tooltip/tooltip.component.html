@@ -1,0 +1,8 @@
+<div class="tooltip" *ngIf="visible" [ngStyle]="{'top.px': positionY, 'left.px': positionX}">
+    <strong>{{ move?.name }}</strong><br>
+    Type: {{ move?.type }}<br>
+    Category: {{ move?.category }}<br>
+    Power: {{ move?.power }}<br>
+    Accuracy: {{ move?.accuracy }}%<br>
+    {{ move?.description }}
+  </div>
