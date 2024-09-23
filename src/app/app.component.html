@@ -110,7 +110,7 @@
       <!-- Button to go back to the main menu -->
       <button class="option" (click)="goToMainMenu()">◄ Go Back</button>
     </div>
-     <div class="move-details-tooltip" *ngIf="showTooltip" [ngStyle]="{ 'bottom.vh': tooltipBottom }">
+     <div class="move-details-tooltip" *ngIf="showTooltip && !isMobile" [ngStyle]="{ 'bottom.vh': tooltipBottom }">
    <!-- <p><strong>Category:</strong> {{ moveDetails?.category }}</p> -->
     
     <p *ngIf="moveDetails?.power" style="display: inline-block; margin-right: 20px;"><strong>Power:</strong> {{ moveDetails?.power }}</p>
