@@ -1,0 +1,438 @@
+import { CommonModule, isPlatformBrowser  } from '@angular/common';
+import { Component,  NgModule } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { OnInit,  PLATFORM_ID, Inject} from '@angular/core';
+import { ScreenSizeService } from './screen-size.service';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet, CommonModule],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css',
+  
+})
+
+
+export class AppComponent implements OnInit {
+  title = 'pokemon-battle';
+  playerHP: number = 600; // Example HP percentage for player
+  opponentHP: number = 600;
+  playerSprite: string = 'assets/images/lafa.png';
+  opponentSprite: string = 'assets/images/cypher.png';
+  playerMoveset: string[] = ["Flame Punch", "Shadow Step", "Blazing Shurikens", "Molten Fang"];
+  opponentMoveset: string[] = ["Volt Dash", "Storm Bark", "Storm Step", "Lightening Kunai"];//"Volt Dash", "Storm Bark", "Storm Step", "Lightening Kunai"
+  isPlayerTurn: boolean = true;
+  gameMessage: string = 'What will Laffa do?';
+  showTooltip = false;
+  moveDetails: any = {};
+  opponentStatus: string = "";
+  playerStatus: string = "";
+  playerHit: boolean = false;
+  opponentHit: boolean = false;
+  playerAttacking: boolean = false;
+  opponentAttackingAnimation: string = "";
+  isDodging: boolean = false;
+  isOpponentDodging: boolean = false;
+  accuracyDecrease: number = 0;
+  OpponentAccuracyDecrease: number = 0;
+  hitImageClass: string = "";
+  hitPlayerImageClass: string = "";
+  playerDancing: boolean = false;
+  opponentDancing: boolean = false;
+  paralyzeCount: number = 0;
+  burnCount: number = 0;
+  playerStamina: number = 50;
+  opponentStamina: number = 50;
+  isMobile: boolean = false;
+  showMainMenu: boolean = true;
+  showFightMenu: boolean = false;
+
+  gameInProgress: boolean = true;
+
+
+  moveList:  { [key: string]: any } =  {
+    // Fire Moves
+   "Flame Punch": {
+   name:  "Flame Punch",
+      category: "Physical",
+      power: 70,
+      accuracy: 100,
+      description: "The user delivers a fiery punch that burns the target.",
+      effect: "15% chance to burn the opponent.",
+      statusEffect: "burn",
+      effectChance: 15,
+      hitImage: "scratch-mark"
+    },
+    "Shadow Step": {
+     name: "Shadow Step",
+      category: "Status",
+      power: 0,
+      accuracy: 200,
+      description: "The user melts into the shadows, becoming untargetable for a short time.",
+      effect: "The user evades all attacks next turn.",
+      statusEffect: "evade",
+    },
+    "Blazing Shurikens":{
+   
+      category: "Special",
+      power: 30,
+      accuracy: 80,
+      description: "The user hurls multiple blazing shurikens at the target.",
+      effect: "Hits 2-5 times in one turn.",
+      statusEffect: "",
+      hitImage: "shurikens"
+    },
+    "Molten Fang" : {
+      category: "Physical",
+      power: 120,
+      accuracy: 70,
+      description: "The user bites with molten-hot fangs that sear the target.",
+      effect: "45% chance to burn the opponent.",
+      statusEffect: "burn",
+      effectChance: 45,
+      hitImage: "bite-mark"
+    },
+  
+    // Electric Moves
+    "Volt Dash": {
+      name:  "Volt Dash",
+      category: "Physical",
+      power: 60,
+      accuracy: 100,
+      description: "The user dashes forward with electrifying speed, shocking the opponent on contact.",
+      effect: "35% chance to paralyze the opponent.",
+      statusEffect: "paralyze",
+      effectChance: 50,
+      hitImage: "volt",
+      attackAnimation: "dash-left"
+    },
+    "Storm Bark": {
+      name: "Thunder Bark",
+      category: "Special",
+      power: 100,
+      accuracy: 85,
+      description: "The user barks loudly, summoning a thunderstorm to strike the opponent.",
+      effect: "30% chance to confuse the opponent.",
+      statusEffect: "confuse",
+      effectChance: 30,
+      hitImage: "thunder",
+      attackAnimation: "shake"
+    },
+   "Storm Step" : {
+      name: "Storm Step",
+      category: "Status",
+      power: 0,
+      accuracy: 200,
+      description: "The user steps through the air, surrouned by an electric storm, becoming nearly untouchable for a turn.",
+      statusEffect: "evade",
+      effectChance: 0,
+      attackAnimation: "step-animation"
+    },
+    "Lightening Kunai" :{
+      name: "Lightning Kunai" ,
+      category: "Special",
+      power: 80,
+      accuracy: 90,
+      description: "The user throws electrically charged kunai that pierce through the target.",
+      effect: "This move never misses.",
+      effectChance: 0,
+      attackAnimation: "dash-left",
+      hitImage: "kunais"
+    },
+  };
+  
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private screenSizeService: ScreenSizeService) {
+    if (!isPlatformBrowser(this.platformId)) {
+      
+      // Use inspector only on the server-side
+    }
+  }
+  
+  triggerAction(action: string, move?: any): void {
+    switch (action) {
+      case 'attackedPlayer':
+        this.playerHit = true; // Add the shaking class
+        this.hitPlayerImageClass = move.hitImage || move;
+        setTimeout(() => {
+          this.playerHit = false; // Remove the shaking class after the animation ends
+          this.hitPlayerImageClass = '';
+        }, 500); // Match the duration of the CSS animation (0.5s)
+        break;
+  
+      case 'attackedOpponent':
+        this.opponentHit = true; // Add the shaking class
+        this.hitImageClass = move.hitImage || move;
+        setTimeout(() => {
+          this.opponentHit = false; // Remove the shaking class after the animation ends
+          this.hitImageClass = '';
+        }, 500); // Match the duration of the CSS animation (0.5s)
+        break;
+  
+      case 'playerAttacking':
+        this.playerAttacking = true; // Add the shaking class
+        setTimeout(() => {
+          this.playerAttacking = false; // Remove the shaking class after the animation ends
+        }, 600); // Match the duration of the CSS animation (0.6s)
+        break;
+
+        case 'opponentAttacking':
+        this.opponentAttackingAnimation = move.attackAnimation; // Add the shaking class
+       
+        setTimeout(() => {
+          this.opponentAttackingAnimation = ""; // Remove the shaking class after the animation ends
+        }, 600); // Match the duration of the CSS animation (0.6s)
+        break;
+  
+      case 'playerDancing':
+        this.playerDancing = true; // Add the shaking class
+        this.hitPlayerImageClass = "shadow-step"
+        setTimeout(() => {
+          this.playerDancing = false; // Remove the shaking class after the animation ends
+          this.hitPlayerImageClass = ""
+        }, 600); // Match the duration of the CSS animation (0.6s)
+        break;
+
+        case 'opponentDancing':
+          this.opponentDancing = true; // Add the shaking class
+          this.hitImageClass = "storm-step"
+          setTimeout(() => {
+            this.opponentDancing = false; // Remove the shaking class after the animation ends
+              this.hitImageClass = ""
+          }, 600); // Match the duration of the CSS animation (0.6s)
+          break;
+  
+        case 'playerCharge':
+        this.hitPlayerImageClass = "charge-aura";
+        setTimeout(() => {
+        this.hitPlayerImageClass = ""
+    } , 600);
+        break;
+      default:
+        console.error('Unknown action:', action);
+    }
+  }
+
+  onFightClick() {
+    this.showMainMenu = false;
+    this.showFightMenu = true;
+    this.gameMessage = 'Choose an attack:';
+  }
+
+  goToMainMenu() {
+    this.showMainMenu = true;
+    this.showFightMenu = false;
+    this.gameMessage = 'What will Laffa do?';
+  }
+
+  ngOnInit(): void {}
+
+  playerAttack(moveName: string) {
+
+    if (!this.gameInProgress) return;
+
+    if (!this.isPlayerTurn) return;
+
+    const move = this.moveList[moveName];
+    const hitChance = Math.random() * 100;
+
+    if (this.playerStatus !== 'paralyzed') {
+      this.triggerAction('playerAttacking');
+      if (hitChance <= (move.accuracy - this.OpponentAccuracyDecrease) ) {
+        this.isPlayerTurn = false;
+       
+        
+        if (moveName === "Blazing Shurikens") {
+          let hitTimes = 0;
+          for (let i = 0; i <= Math.random() * (5 - 2) + 2; i++)
+            setTimeout(() => {
+              this.executeMove(moveName, move);
+          hitTimes = i;
+          this.gameMessage = moveName === "Blazing Shurikens" ? `It hit ` + hitTimes + ` times!` : `It hit!`;
+            }, i * 200);
+            
+        } else  { 
+          this.executeMove(moveName, move);
+          this.gameMessage = ['Shadow Step', 'Storm Step'].includes(move) ? `Laffa used ${moveName}. Cypher's accuracy decreased greatly for one turn` : `Laffa used ${moveName}. It hit!`;
+       }
+      } else {
+        this.missAttack(moveName);
+
+        this.OpponentAccuracyDecrease = 0;
+      }
+    } else {
+      this.playerParalyzed();
+    }
+    this.showTooltip = false;
+  }
+
+  executeMove(moveName: string, move: any) {
+    if (['Shadow Step', 'Storm Step'].includes(moveName)) {
+      this.dodgeMove(moveName);
+    } else {
+      this.applyDamageAndEffect(move);
+    }
+  }
+
+  missAttack(moveName: string) {
+    this.gameMessage = `Laffa used ${moveName}. It missed!`;
+    this.isPlayerTurn = false;
+    this.opponentTurn();
+  }
+
+  dodgeMove(moveName: string) {
+    this.isDodging = true;
+    this.accuracyDecrease = 80;
+    this.triggerAction('playerDancing');
+    setTimeout(() => this.opponentTurn(), 500);
+    this.showMainMenu = true;
+    this.showFightMenu = false;
+  }
+
+  playerParalyzed() {
+    this.gameMessage = 'Laffa is paralyzed, she can’t move';
+    if (this.paralyzeCount > 0) {
+      this.paralyzeCount--;
+      this.triggerAction('attackedPlayer', 'zap');
+    }
+    if (this.paralyzeCount <= 0) this.playerStatus = '';
+    this.isPlayerTurn = false;
+    this.opponentTurn();
+  }
+
+  applyDamageAndEffect(move: any) {
+    setTimeout(() => {
+      this.applyDamage(move);
+      const effectChance = Math.random() * 100;
+      if (effectChance < move.effectChance) this.applyEffect(move, 'opponentStatus');
+      if (this.opponentHP !== 0) this.opponentTurn();
+      this.resetTurn();
+    }, 500);
+  }
+
+  applyDamage(move: any) {
+    this.opponentHP = Math.max(0, this.opponentHP - move.power);
+    this.triggerAction('attackedOpponent', move);
+    if (this.opponentHP === 0) {
+      this.gameMessage = 'Laffa won! Opponent is defeated.';
+      this.gameInProgress = false;
+    }
+  }
+
+  applyEffect(move: any, toWho: 'playerStatus' | 'opponentStatus') {
+    if (move.statusEffect === 'burn') {
+      this[toWho] = 'burned'; // Dynamically set the status
+      this.gameMessage += ` ${toWho === 'playerStatus' ? 'The player' : 'The opponent'} is burned!`;
+      this.burnCount = Math.random() * 4;
+    } else if (move.statusEffect === 'paralyze') {
+      this[toWho] = 'paralyzed'; // Dynamically set the status
+      this.gameMessage += ` ${toWho === 'playerStatus' ? 'The player' : 'The opponent'} is paralyzed!`;
+      this.paralyzeCount = Math.random() * 4;
+    }
+
+  }
+
+  opponentTurn() {
+
+    if (!this.gameInProgress) return;
+
+    setTimeout(() => {
+       this.gameMessage = "Cypher's turn!"
+      const move = this.randomOpponentMove();
+      if (move.statusEffect === 'evade') {
+        this.OpponentAccuracyDecrease = 80;
+        this.triggerAction('opponentDancing');
+        this.gameMessage =  `Cypher used ${move.name}. Laffa's accuracy decreased greatly for one turn`;
+        this.opponentPostTurn();
+      } else {
+        this.triggerAction('opponentAttacking', move);
+        this.applyOpponentDamage(move);
+        this.gameMessage =  `Cypher used ${move.name}. It hit!`;
+        this.opponentPostTurn();
+        this.accuracyDecrease = 0;
+      }
+    }, 1000);
+  }
+
+  randomOpponentMove() {
+    return this.moveList[this.opponentMoveset[Math.floor(Math.random() * this.opponentMoveset.length)]];
+  }
+
+  applyOpponentDamage(move: any) {
+    const hitChance = Math.random() * 100;
+    if (hitChance <= (move.accuracy - this.accuracyDecrease)) {
+      this.playerHP = Math.max(0, this.playerHP - move.power);
+      this.triggerAction('attackedPlayer', move);
+      if (this.playerHP === 0) {
+        this.gameMessage = 'Cypher won! You are defeated.';
+        this.gameInProgress = false;
+      }
+    } else {
+      this.gameMessage = `Cypher used ${move.name}. It missed!`;
+    }
+  }
+
+  resetTurn() {
+    this.isPlayerTurn = true;
+    this.showMainMenu = true;
+    this.showFightMenu = false;
+    this.showTooltip = false;
+  }
+
+  opponentPostTurn() {
+    if (this.burnCount > 0) {
+      setTimeout(() => {
+      this.burnCount--;
+      this.triggerAction('attackedOpponent', 'burn');
+      this.opponentHP = Math.max(0, this.opponentHP - 50);
+    }, 700);
+    if (this.opponentHP == 0) {
+      this.gameMessage = 'Laffa won! Opponent is defeated.';
+      this.gameInProgress = false;
+    } 
+    }
+    if (this.burnCount <= 0) this.opponentStatus = '';
+    this.isPlayerTurn = true;
+  }
+
+  showMoveDetails(move: string): void {
+    this.moveDetails = this.moveList[move] || {};
+    this.tooltipBottom = 20;
+    this.showTooltip = true;
+  }
+
+  hideMoveDetails(): void {
+    this.showTooltip = false;
+    this.moveDetails = {};
+  }
+
+  
+  tooltipBottom: number = 20;
+
+
+  actionDesc: string = "";
+ 
+
+  showActionDetails(action: string): void {
+    this.actionDesc = action;  
+    this.showTooltip = true;
+      this.tooltipBottom = 0
+  }
+
+  boostStamina(): void {
+    this.playerStamina = Math.min(100, this.playerStamina + 20);
+    this.triggerAction('playerCharge', 'charge-aura');
+    this.gameMessage = `Laffa boosted stamina by 20.`;
+    this.isPlayerTurn = false;
+    this.opponentTurn();
+  }
+
+  heal(): void {
+    const healAmount = Math.min(600 - this.playerHP, this.playerStamina * 3);
+    this.playerHP += healAmount;
+    this.playerStamina -= healAmount / 6;
+    this.gameMessage = `Laffa healed ${healAmount} HP!`;
+    this.isPlayerTurn = false;
+    this.opponentTurn();
+  }
+}

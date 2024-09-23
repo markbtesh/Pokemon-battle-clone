@@ -589,11 +589,11 @@
     }
 
     50% {
-      transform: translateY(-100px)translateX(-200px)rotate(8deg); 
+      transform: translateY(-10vw)translateX(-20vw)rotate(8deg); 
      }
 
      100% {
-      transform: translateY(-100px)translateX(-200px)rotate(-8deg); 
+      transform: translateY(-10vw)translateX(-20vw)rotate(-8deg); 
      }
 
      
@@ -921,5 +921,98 @@
         font-size: 1.2em;
        
       }
+
+
+
+
+      
+  .scratch-mark {
+    width: 25vw;
+    height: 10vh;
+   
+    margin-top: -150px;
+    margin-left: 30px;
+  }
+
+  
+  .volt {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    margin-top: -100px;
+  }
+  
+  .shurikens{
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: url(../assets/images/shurikens.png);
+    background-size: contain  ;
+    margin: -10px auto;
+    margin-top: -350px;
+    margin-left: -50px;
+    transition: translate 0.2s;
+    animation: shurikens 0.2s;
+  }
+
+  .kunais{
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: url(../assets/images/kunais.png);
+    background-size: contain ;
+    margin: -10px auto;
+    margin-top: -350px;
+    margin-left: 50px;
+    transition: translate 0.2s;
+    animation: kunais 0.2s;
+  }
+
+  .burn{
+    width: 30vw;
+    height: 40vh;
+    margin-top: -150px;
+  }
+
+  .thunder{
+    position: absolute;
+    width: 50vw;
+    height: 70vh;
+   
+    margin-top: -200px;
+ 
+  }
+
+
+  .shadow-step, .storm-step{
+    width: 35vw;
+    height: 70vh;
+    margin-top: -150px;
+   
+ 
+  }
+
+  .bite-mark {
+    width: 20vw;
+    height: 10vh;
+    margin-top: -120px;
+  }
+
+
+  .zap {
+    
+    width: 30vw;
+    height: 30vh;
+    margin-top: -220px;
+    margin-left: -10px;
+   
+  }
+
+  .charge-aura {
+    width: 60vw;
+    height: 70vh;
+    margin-top: -220px;
+    margin-left: -65px;
+  }
   }
   
