@@ -254,7 +254,7 @@ console.log(hitChance)
       if (moveName === "Shadow Step" || moveName === "Storm Step" ) {
 
         this.isDodging = true;
-        this.accuracyDecrease = 80;
+        this.accuracyDecrease = 70;
  
         this.triggerAction("playerDancing");
 
@@ -386,8 +386,8 @@ console.log(hitChance)
       if (move.name === "Shadow Step" || move.name === "Storm Step" ) {
        
         this.isOpponentDodging = true;
-        this.OpponentAccuracyDecrease = 80;
-        this.gameMessage = this.OpponentAccuracyDecrease === 80 ? `Cypher used ${move.name}. Lafa's accuracy decreased greatly for one turn` :`Cypher used ${move.name}.`;
+        this.OpponentAccuracyDecrease = 70;
+        this.gameMessage = this.OpponentAccuracyDecrease === 70 ? `Cypher used ${move.name}. Lafa's accuracy decreased greatly for one turn` :`Cypher used ${move.name}.`;
         this.triggerAction("opponentDancing");
 
         if (this.burnCount > 0 && this.opponentHP > 0) {
